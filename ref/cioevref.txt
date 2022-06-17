@@ -1,0 +1,63 @@
+=====================================
+Win32 Console API Structure Reference
+-------------------------------------
+                  Updated: 2022-05-10
+=====================================
+
+A reference for Win32 Console WinEvents,
+  intended to be clear and self-contained.
+
+Sources: Microsoft Docs > Console Developer's guide & API
+  Reference > Console API Winevents > ...
+https://docs.microsoft.com/en-us/windows/console/console-structures
+
+WinEvents are part of the legacy Microsoft Active Accessibility
+  framework. WinEvents development is discouraged in favor of the
+  Microsoft UI Automation framrwork.
+
+WinEvents general reference
+https://docs.microsoft.com/en-us/windows/win32/winauto/winevents-infrastructure
+
+WINEVENTPROC callback function (winuser.h)
+https://docs.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wineventproc
+
+Legacy: Microsoft Active Accessibility (COM-based)
+https://docs.microsoft.com/en-us/windows/win32/winauto/microsoft-active-accessibility
+
+Preferred: Microsoft UI Automation
+https://docs.microsoft.com/en-us/windows/win32/winauto/entry-uiauto-win32
+
+Registering for WinEvents occurs at a system level, and has a
+  performance impact on all command-line applications running
+  at the same time, including services and background utilities.
+  The Microsoft UI Automation framework is console session
+  specific, which reduces this performance impact.
+
+------------------------------
+WINEVENTPROC Wineventproc;
+
+void Wineventproc(
+  HWINEVENTHOOK hWinEventHook,
+  DWORD event,
+  HWND hwnd,
+  LONG idObject,
+  LONG idChild,
+  DWORD idEventThread,
+  DWORD dwmsEventTime
+)
+------------------------------
+
+[Pending]
+
+----------------------------
+EVENT_CONSOLE_CARET (0x4001)
+----------------------------
+
+[Pending]
+
+--------------------------------------
+EVENT_CONSOLE_END_APPLICATION (0x4007)
+--------------------------------------
+
+[Pending]
+
