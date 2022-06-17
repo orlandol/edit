@@ -15,6 +15,9 @@ Console* console = NULL;
  *
  */
 void Cleanup() {
+  ResetKeyHandler( console );
+  ResetMouseHandler( console );
+
   ReleaseConsole( &console );
 }
 
@@ -28,6 +31,11 @@ int main( int argc, char** argv ) {
   if( console == NULL ) {
     printf( "Error initializing console\n" );
     exit(1);
+  }
+
+  while( IsActive(console) ) {
+    RouteEvents( console );
+    UpdateUI( console );
   }
 
   Cleanup();
