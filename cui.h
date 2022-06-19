@@ -10,6 +10,14 @@ void ReleaseConsole( Console** consolePtr );
 
 /** Event handler declarations **/
 
+enum EventType {
+  evtKeyDown = 1,
+  evtKeyUp,
+  evtMouseMove,
+  evtMouseUp,
+  evtMouseDown
+};
+
 /// Keyboard event declarations ///
 
 typedef struct KeyCodeType {
@@ -18,13 +26,19 @@ typedef struct KeyCodeType {
   unsigned keyReturn;
   unsigned keyBackspace;
   unsigned keyTab;
+
   unsigned keyLeftShift;
   unsigned keyRightShift;
   unsigned keyShift;
+
   unsigned keyLeftCtrl;
   unsigned keyRightCtrl;
   unsigned keyCtrl;
+
+  unsigned keyLeftMenu;
+  unsigned keyRightMenu;
   unsigned keyMenu;
+
   unsigned keyPause;
 
   unsigned keyInsert;
@@ -46,6 +60,18 @@ typedef struct KeyCodeType {
   unsigned keyF10;
   unsigned keyF11;
   unsigned keyF12;
+  unsigned keyF13;
+  unsigned keyF14;
+  unsigned keyF15;
+  unsigned keyF16;
+  unsigned keyF17;
+  unsigned keyF18;
+  unsigned keyF19;
+  unsigned keyF20;
+  unsigned keyF21;
+  unsigned keyF22;
+  unsigned keyF23;
+  unsigned keyF24;
 
   unsigned keyPageUp;
   unsigned keyPageDown;
@@ -59,9 +85,7 @@ typedef struct KeyCodeType {
 
   unsigned keyLeftWin;
   unsigned keyRightWin;
-
-  unsigned keyTilde;
-  unsigned keyUnderscore;
+  unsigned keyWin;
 
   unsigned key0;
   unsigned key1;
@@ -119,35 +143,36 @@ typedef struct KeyCodeType {
   unsigned keyY;
   unsigned keyZ;
 } KeyCodeType;
-
 extern const KeyCodeType KeyCode;
 
-enum ControlKeyState {
-  capsLockOn = (1 << 0),
-  numLockOn = (1 << 1),
-  scrollLockOn = (1 << 2),
+typedef struct ModifierType {
+  unsigned capsLockOn;
+  unsigned numLockOn;
+  unsigned scrollLockOn;
 
-  leftShiftKeyDown = (1 << 3),
-  rightShiftKeyDown = (1 << 4),
-  shiftKeyDown = (leftShiftKeyDown | rightShiftKeyDown),
+  unsigned leftShiftKeyDown;
+  unsigned rightShiftKeyDown;
+  unsigned shiftKeyDown;
 
-  leftAltKeyDown = (1 << 5),
-  rightAltKeyDown = (1 << 6),
-  altKeyDown = (leftAltKeyDown | rightAltKeyDown),
+  unsigned leftAltKeyDown;
+  unsigned rightAltKeyDown;
+  unsigned altKeyDown;
 
-  leftCtrlKeyDown = (1 << 7),
-  rightCtrlKeyDown = (1 << 8),
-  ctrlKeyDown = (leftCtrlKeyDown | rightCtrlKeyDown)
-};
+  unsigned leftCtrlKeyDown;
+  unsigned rightCtrlKeyDown;
+  unsigned ctrlKeyDown;
+} ModifierType;
+extern const ModifierType Modifier;
 
 typedef struct KeyEvent {
+  unsigned eventType;
   unsigned keyCode;
   char keyChar;
   unsigned repeatCount;
-  unsigned controlKeyState;
+  unsigned modifiers;
 } KeyEvent;
 
-typedef unsigned (*KeyHandler)( void* handlerData );
+typedef unsigned (*KeyHandler)( Console *console, void* handlerData, KeyEvent* keyEvent );
 
 unsigned SetKeyHandler( Console* console,
   KeyHandler onKey, void* handlerData );

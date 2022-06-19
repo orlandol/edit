@@ -9,7 +9,150 @@
 
 #include "..\cui.h"
 
+/* Reference:
+https://docs.microsoft.com/en-us/windows-hardware/customize/enterprise/keyboardfilter-key-names
+*/
+
 const KeyCodeType KeyCode = {
+  .keyEscape = VK_ESCAPE,
+  .keySpace = VK_SPACE,
+  .keyReturn = VK_RETURN,
+  .keyBackspace = VK_BACK,
+  .keyTab = VK_TAB,
+
+  .keyLeftShift = VK_LSHIFT,
+  .keyRightShift = VK_RSHIFT,
+  .keyShift = VK_SHIFT,
+
+  .keyLeftCtrl = VK_LCONTROL,
+  .keyRightCtrl = VK_RCONTROL,
+  .keyCtrl = VK_CONTROL,
+
+  .keyLeftMenu = VK_LMENU,
+  .keyRightMenu = VK_RMENU,
+  .keyMenu = VK_MENU,
+
+  .keyPause = VK_PAUSE,
+
+  .keyInsert = VK_INSERT,
+  .keyDelete = VK_DELETE,
+
+  .keyCapsLock = VK_CAPITAL,
+  .keyScrollLock = VK_SCROLL,
+  .keyNumLock = VK_NUMLOCK,
+
+  .keyF1 = VK_F1,
+  .keyF2 = VK_F2,
+  .keyF3 = VK_F3,
+  .keyF4 = VK_F4,
+  .keyF5 = VK_F5,
+  .keyF6 = VK_F6,
+  .keyF7 = VK_F7,
+  .keyF8 = VK_F8,
+  .keyF9 = VK_F9,
+  .keyF10 = VK_F10,
+  .keyF11 = VK_F11,
+  .keyF12 = VK_F12,
+  .keyF13 = VK_F13,
+  .keyF14 = VK_F14,
+  .keyF15 = VK_F15,
+  .keyF16 = VK_F16,
+  .keyF17 = VK_F17,
+  .keyF18 = VK_F18,
+  .keyF19 = VK_F19,
+  .keyF20 = VK_F20,
+  .keyF21 = VK_F21,
+  .keyF22 = VK_F22,
+  .keyF23 = VK_F23,
+  .keyF24 = VK_F24,
+
+  .keyPageUp = VK_NEXT,
+  .keyPageDown = VK_PRIOR,
+  .keyHome = VK_HOME,
+  .keyEnd = VK_END,
+  .keyLeft = VK_LEFT,
+  .keyUp = VK_UP,
+  .keyRight = VK_RIGHT,
+  .keyDown = VK_DOWN,
+  .keyPrintScreen = VK_SNAPSHOT,
+
+  .keyLeftWin = VK_LWIN,
+  .keyRightWin = VK_RWIN,
+  .keyWin = VK_LWIN,
+
+  .key0 = '0',
+  .key1 = '1',
+  .key2 = '2',
+  .key3 = '3',
+  .key4 = '4',
+  .key5 = '5',
+  .key6 = '6',
+  .key7 = '7',
+  .key8 = '8',
+  .key9 = '9',
+
+  .num0 = VK_NUMPAD0,
+  .num1 = VK_NUMPAD1,
+  .num2 = VK_NUMPAD2,
+  .num3 = VK_NUMPAD3,
+  .num4 = VK_NUMPAD4,
+  .num5 = VK_NUMPAD5,
+  .num6 = VK_NUMPAD6,
+  .num7 = VK_NUMPAD7,
+  .num8 = VK_NUMPAD8,
+  .num9 = VK_NUMPAD9,
+
+  .numMul = VK_MULTIPLY,
+  .numDiv = VK_DIVIDE,
+  .numAdd = VK_ADD,
+  .numSub = VK_SUBTRACT,
+  .numDot = VK_DECIMAL,
+  .numEnter = VK_RETURN,
+
+  .keyA = 'A',
+  .keyB = 'B',
+  .keyC = 'C',
+  .keyD = 'D',
+  .keyE = 'E',
+  .keyF = 'F',
+  .keyG = 'G',
+  .keyH = 'H',
+  .keyI = 'I',
+  .keyJ = 'J',
+  .keyK = 'K',
+  .keyL = 'L',
+  .keyM = 'M',
+  .keyN = 'N',
+  .keyO = 'O',
+  .keyP = 'P',
+  .keyQ = 'Q',
+  .keyR = 'R',
+  .keyS = 'S',
+  .keyT = 'T',
+  .keyU = 'U',
+  .keyV = 'V',
+  .keyW = 'W',
+  .keyX = 'X',
+  .keyY = 'Y',
+  .keyZ = 'Z',
+};
+
+const ModifierType Modifier = {
+  .capsLockOn = CAPSLOCK_ON,
+  .numLockOn = NUMLOCK_ON,
+  .scrollLockOn = SCROLLLOCK_ON,
+
+  .leftShiftKeyDown = 0,
+  .rightShiftKeyDown = 0,
+  .shiftKeyDown = SHIFT_PRESSED,
+
+  .leftAltKeyDown = LEFT_ALT_PRESSED,
+  .rightAltKeyDown = RIGHT_ALT_PRESSED,
+  .altKeyDown = (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED),
+
+  .leftCtrlKeyDown = LEFT_CTRL_PRESSED,
+  .rightCtrlKeyDown = RIGHT_CTRL_PRESSED,
+  .ctrlKeyDown = (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 };
 
 /** Abstract console Win32 implementation **/
@@ -318,6 +461,7 @@ unsigned IsActive( Console* console ) {
 void RouteEvents( Console* console ) {
   DWORD eventsRead = 1;
   INPUT_RECORD event;
+  KeyEvent keyEvent = {};
 
   if( !(console && (console->stdinHandle != INVALID_HANDLE_VALUE) &&
       console->isActive) ) {
@@ -339,8 +483,19 @@ void RouteEvents( Console* console ) {
 
     switch( event.EventType ) {
     case KEY_EVENT:
-      if( console->onKey && console->onKey(console->onKeyData) ) {
-        return; // Developer processed event
+      memset( &keyEvent, 0, sizeof(keyEvent) );
+
+      keyEvent.eventType = evtKeyUp;
+      if( event.Event.KeyEvent.bKeyDown ) {
+        keyEvent.eventType = evtKeyDown;
+      }
+
+      keyEvent.keyCode = event.Event.KeyEvent.wVirtualKeyCode;
+      keyEvent.keyChar = event.Event.KeyEvent.uChar.AsciiChar;
+      keyEvent.modifiers = event.Event.KeyEvent.dwControlKeyState;
+
+      if( console->onKey && console->onKey(console, console->onKeyData, &keyEvent) ) {
+        continue; // Developer processed event
       }
       break;
 

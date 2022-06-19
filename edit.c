@@ -11,6 +11,18 @@ Console* console = NULL;
 
 unsigned ConfirmClose( void* handlerData );
 
+unsigned onKey( Console* console, void* handlerData, KeyEvent* keyEvent ) {
+  if( console && keyEvent ) {
+    if( (keyEvent->eventType == evtKeyUp) &&
+        (keyEvent->keyCode == KeyCode.keyEscape) ) {
+      ExitApp( console );
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 /*
  * void Cleanup()
  *
@@ -40,11 +52,13 @@ int main( int argc, char** argv ) {
 
   SetCloseHandler( console, ConfirmClose, NULL );
 
+  SetKeyHandler( console, onKey, NULL );
+
   while( IsActive(console) ) {
     RouteEvents( console );
     UpdateUI( console );
 
-    ExitApp( console ); // Temporary placeholder
+//    ExitApp( console ); // Temporary placeholder
   }
 
   Cleanup();
