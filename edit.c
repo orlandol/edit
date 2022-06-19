@@ -3,8 +3,13 @@
 #include <stdio.h>
 
 #include "edit.h"
+#include "cui.h"
 
 Console* console = NULL;
+
+/** Edit event handler declarations **/
+
+unsigned ConfirmClose( void* handlerData );
 
 /*
  * void Cleanup()
@@ -33,12 +38,22 @@ int main( int argc, char** argv ) {
     exit(1);
   }
 
+  SetCloseHandler( console, ConfirmClose, NULL );
+
   while( IsActive(console) ) {
     RouteEvents( console );
     UpdateUI( console );
+
+    ExitApp( console ); // Temporary placeholder
   }
 
   Cleanup();
 
   return 0;
+}
+
+/** Edit event handler implementation **/
+
+unsigned ConfirmClose( void* handlerData ) {
+  return 1; // Temporary placeholder
 }
