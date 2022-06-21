@@ -13,8 +13,7 @@ unsigned ConfirmClose( void* handlerData );
 
 unsigned onKey( Console* console, void* handlerData, KeyEvent* keyEvent ) {
   if( console && keyEvent ) {
-    if( (keyEvent->eventType == evtKeyUp) &&
-        (keyEvent->keyCode == KeyCode.keyEscape) ) {
+    if( keyEvent->keyCode == keyEscape ) {
       ExitApp( console );
       return 1;
     }
@@ -57,8 +56,6 @@ int main( int argc, char** argv ) {
   while( IsActive(console) ) {
     RouteEvents( console );
     UpdateUI( console );
-
-//    ExitApp( console ); // Temporary placeholder
   }
 
   Cleanup();

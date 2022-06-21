@@ -20,149 +20,129 @@ enum EventType {
 
 /// Keyboard event declarations ///
 
-typedef struct KeyCodeType {
-  unsigned keyEscape;
-  unsigned keySpace;
-  unsigned keyReturn;
-  unsigned keyBackspace;
-  unsigned keyTab;
+/// Key code declarations ///
+extern const unsigned keyEscape;
+extern const unsigned keySpace;
+extern const unsigned keyReturn;
+extern const unsigned keyBackspace;
+extern const unsigned keyTab;
+extern const unsigned keyLeftShift;
+extern const unsigned keyRightShift;
+extern const unsigned keyShift;
+extern const unsigned keyLeftCtrl;
+extern const unsigned keyRightCtrl;
+extern const unsigned keyCtrl;
+extern const unsigned keyLeftMenu;
+extern const unsigned keyRightMenu;
+extern const unsigned keyMenu;
+extern const unsigned keyPause;
+extern const unsigned keyInsert;
+extern const unsigned keyDelete;
+extern const unsigned keyCapsLock;
+extern const unsigned keyScrollLock;
+extern const unsigned keyNumLock;
+extern const unsigned keyF1;
+extern const unsigned keyF2;
+extern const unsigned keyF3;
+extern const unsigned keyF4;
+extern const unsigned keyF5;
+extern const unsigned keyF6;
+extern const unsigned keyF7;
+extern const unsigned keyF8;
+extern const unsigned keyF9;
+extern const unsigned keyF10;
+extern const unsigned keyF11;
+extern const unsigned keyF12;
+extern const unsigned keyF13;
+extern const unsigned keyF14;
+extern const unsigned keyF15;
+extern const unsigned keyF16;
+extern const unsigned keyF17;
+extern const unsigned keyF18;
+extern const unsigned keyF19;
+extern const unsigned keyF20;
+extern const unsigned keyF21;
+extern const unsigned keyF22;
+extern const unsigned keyF23;
+extern const unsigned keyF24;
+extern const unsigned keyPageUp;
+extern const unsigned keyPageDown;
+extern const unsigned keyHome;
+extern const unsigned keyEnd;
+extern const unsigned keyLeft;
+extern const unsigned keyUp;
+extern const unsigned keyRight;
+extern const unsigned keyDown;
+extern const unsigned keyPrintScreen;
+extern const unsigned keyLeftWin;
+extern const unsigned keyRightWin;
+extern const unsigned keyWin;
+extern const unsigned key0;
+extern const unsigned key1;
+extern const unsigned key2;
+extern const unsigned key3;
+extern const unsigned key4;
+extern const unsigned key5;
+extern const unsigned key6;
+extern const unsigned key7;
+extern const unsigned key8;
+extern const unsigned key9;
+extern const unsigned num0;
+extern const unsigned num1;
+extern const unsigned num2;
+extern const unsigned num3;
+extern const unsigned num4;
+extern const unsigned num5;
+extern const unsigned num6;
+extern const unsigned num7;
+extern const unsigned num8;
+extern const unsigned num9;
+extern const unsigned numMul;
+extern const unsigned numDiv;
+extern const unsigned numAdd;
+extern const unsigned numSub;
+extern const unsigned numDot;
+extern const unsigned numEnter;
+extern const unsigned keyA;
+extern const unsigned keyB;
+extern const unsigned keyC;
+extern const unsigned keyD;
+extern const unsigned keyE;
+extern const unsigned keyF;
+extern const unsigned keyG;
+extern const unsigned keyH;
+extern const unsigned keyI;
+extern const unsigned keyJ;
+extern const unsigned keyK;
+extern const unsigned keyL;
+extern const unsigned keyM;
+extern const unsigned keyN;
+extern const unsigned keyO;
+extern const unsigned keyP;
+extern const unsigned keyQ;
+extern const unsigned keyR;
+extern const unsigned keyS;
+extern const unsigned keyT;
+extern const unsigned keyU;
+extern const unsigned keyV;
+extern const unsigned keyW;
+extern const unsigned keyX;
+extern const unsigned keyY;
+extern const unsigned keyZ;
 
-  unsigned keyLeftShift;
-  unsigned keyRightShift;
-  unsigned keyShift;
-
-  unsigned keyLeftCtrl;
-  unsigned keyRightCtrl;
-  unsigned keyCtrl;
-
-  unsigned keyLeftMenu;
-  unsigned keyRightMenu;
-  unsigned keyMenu;
-
-  unsigned keyPause;
-
-  unsigned keyInsert;
-  unsigned keyDelete;
-
-  unsigned keyCapsLock;
-  unsigned keyScrollLock;
-  unsigned keyNumLock;
-
-  unsigned keyF1;
-  unsigned keyF2;
-  unsigned keyF3;
-  unsigned keyF4;
-  unsigned keyF5;
-  unsigned keyF6;
-  unsigned keyF7;
-  unsigned keyF8;
-  unsigned keyF9;
-  unsigned keyF10;
-  unsigned keyF11;
-  unsigned keyF12;
-  unsigned keyF13;
-  unsigned keyF14;
-  unsigned keyF15;
-  unsigned keyF16;
-  unsigned keyF17;
-  unsigned keyF18;
-  unsigned keyF19;
-  unsigned keyF20;
-  unsigned keyF21;
-  unsigned keyF22;
-  unsigned keyF23;
-  unsigned keyF24;
-
-  unsigned keyPageUp;
-  unsigned keyPageDown;
-  unsigned keyHome;
-  unsigned keyEnd;
-  unsigned keyLeft;
-  unsigned keyUp;
-  unsigned keyRight;
-  unsigned keyDown;
-  unsigned keyPrintScreen;
-
-  unsigned keyLeftWin;
-  unsigned keyRightWin;
-  unsigned keyWin;
-
-  unsigned key0;
-  unsigned key1;
-  unsigned key2;
-  unsigned key3;
-  unsigned key4;
-  unsigned key5;
-  unsigned key6;
-  unsigned key7;
-  unsigned key8;
-  unsigned key9;
-
-  unsigned num0;
-  unsigned num1;
-  unsigned num2;
-  unsigned num3;
-  unsigned num4;
-  unsigned num5;
-  unsigned num6;
-  unsigned num7;
-  unsigned num8;
-  unsigned num9;
-
-  unsigned numMul;
-  unsigned numDiv;
-  unsigned numAdd;
-  unsigned numSub;
-  unsigned numDot;
-  unsigned numEnter;
-
-  unsigned keyA;
-  unsigned keyB;
-  unsigned keyC;
-  unsigned keyD;
-  unsigned keyE;
-  unsigned keyF;
-  unsigned keyG;
-  unsigned keyH;
-  unsigned keyI;
-  unsigned keyJ;
-  unsigned keyK;
-  unsigned keyL;
-  unsigned keyM;
-  unsigned keyN;
-  unsigned keyO;
-  unsigned keyP;
-  unsigned keyQ;
-  unsigned keyR;
-  unsigned keyS;
-  unsigned keyT;
-  unsigned keyU;
-  unsigned keyV;
-  unsigned keyW;
-  unsigned keyX;
-  unsigned keyY;
-  unsigned keyZ;
-} KeyCodeType;
-extern const KeyCodeType KeyCode;
-
-typedef struct ModifierType {
-  unsigned capsLockOn;
-  unsigned numLockOn;
-  unsigned scrollLockOn;
-
-  unsigned leftShiftKeyDown;
-  unsigned rightShiftKeyDown;
-  unsigned shiftKeyDown;
-
-  unsigned leftAltKeyDown;
-  unsigned rightAltKeyDown;
-  unsigned altKeyDown;
-
-  unsigned leftCtrlKeyDown;
-  unsigned rightCtrlKeyDown;
-  unsigned ctrlKeyDown;
-} ModifierType;
-extern const ModifierType Modifier;
+/// Modifier declarations ///
+extern const unsigned capsLockOn;
+extern const unsigned numLockOn;
+extern const unsigned scrollLockOn;
+extern const unsigned leftShiftKeyDown;
+extern const unsigned rightShiftKeyDown;
+extern const unsigned shiftKeyDown;
+extern const unsigned leftAltKeyDown;
+extern const unsigned rightAltKeyDown;
+extern const unsigned altKeyDown;
+extern const unsigned leftCtrlKeyDown;
+extern const unsigned rightCtrlKeyDown;
+extern const unsigned ctrlKeyDown;
 
 typedef struct KeyEvent {
   unsigned eventType;
