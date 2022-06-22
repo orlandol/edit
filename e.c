@@ -7,6 +7,25 @@
 unsigned InitConsole();
 void ReleaseConsole();
 
+void ConPutChar( char ch );
+
+/** Event declarations **/
+
+#ifdef _WIN32
+#include "windows.h"
+
+#define keyEscape (VK_ESCAPE)
+#endif
+
+typedef struct KeyInfo {
+  unsigned code;
+  char ch;
+  unsigned modifiers;
+} KeyInfo;
+
+unsigned ReadKey( KeyInfo* key );
+void RouteEvent();
+
 /** App declarations **/
 
 /// App main loop declarations ///
@@ -22,6 +41,8 @@ void Cleanup() {
 }
 
 int main( int argc, char** argv ) {
+  KeyInfo key = {};
+
   atexit( Cleanup );
 
   if( InitConsole() == 0 ) {
@@ -29,8 +50,23 @@ int main( int argc, char** argv ) {
     exit(1);
   }
 
+  ConPutChar( '!' );
   while( IsActive() ) {
-    ExitApp(); // Temporary placeholder
+
+    if( ReadKey(&key) ) {
+      switch( key.code ) {
+      case keyEscape:
+        ExitApp();
+        break;
+
+      default:
+        if( key.ch ) {
+          ConPutChar( key.ch );
+        }
+      }
+    } else {
+      RouteEvent();
+    }
   }
 
   ReleaseConsole();
@@ -52,21 +88,21 @@ unsigned appIsActive = 0;
 
 DWORD callerInputMode = 0;
 
-HANDLE stdIn = INVALID_HANDLE_VALUE;
-HANDLE stdOut = INVALID_HANDLE_VALUE;
-HANDLE stdErr = INVALID_HANDLE_VALUE;
+HANDLE stdInput = INVALID_HANDLE_VALUE;
+HANDLE stdOutput = INVALID_HANDLE_VALUE;
+HANDLE stdError = INVALID_HANDLE_VALUE;
 
 HANDLE outBuffer = INVALID_HANDLE_VALUE;
 
 unsigned InitConsole() {
-  stdIn = GetStdHandle(STD_INPUT_HANDLE);
-  stdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  stdErr = GetStdHandle(STD_ERROR_HANDLE);
+  stdInput = GetStdHandle(STD_INPUT_HANDLE);
+  stdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+  stdError = GetStdHandle(STD_ERROR_HANDLE);
 
   // Initialize handle values for proper cleanup
-  if( (stdIn == INVALID_HANDLE_VALUE) ||
-      (stdOut == INVALID_HANDLE_VALUE) ||
-      (stdErr == INVALID_HANDLE_VALUE) ) {
+  if( (stdInput == INVALID_HANDLE_VALUE) ||
+      (stdOutput == INVALID_HANDLE_VALUE) ||
+      (stdError == INVALID_HANDLE_VALUE) ) {
     goto ReturnError;
   }
 
@@ -86,12 +122,12 @@ unsigned InitConsole() {
   }
 
   // Save OS input mode
-  if( GetConsoleMode(stdIn, &callerInputMode) == 0 ) {
+  if( GetConsoleMode(stdInput, &callerInputMode) == 0 ) {
     goto ReturnError;
   }
 
   // Set Edit input mode
-  if( SetConsoleMode(stdIn, ENABLE_EXTENDED_FLAGS |
+  if( SetConsoleMode(stdInput, ENABLE_EXTENDED_FLAGS |
       ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT |
       ENABLE_WINDOW_INPUT) == 0 ) {
     goto ReturnError;
@@ -107,16 +143,16 @@ ReturnError:
 }
 
 void ReleaseConsole() {
-  if( stdIn != INVALID_HANDLE_VALUE ) {
-    FlushConsoleInputBuffer( stdIn );
+  if( stdInput != INVALID_HANDLE_VALUE ) {
+    FlushConsoleInputBuffer( stdInput );
 
     if( callerInputMode ) {
-      SetConsoleMode( stdIn, callerInputMode );
+      SetConsoleMode( stdInput, callerInputMode );
     }
   }
 
-  if( stdOut != INVALID_HANDLE_VALUE ) {
-    SetConsoleActiveScreenBuffer( stdOut );
+  if( stdOutput != INVALID_HANDLE_VALUE ) {
+    SetConsoleActiveScreenBuffer( stdOutput );
   }
 
   if( outBuffer != INVALID_HANDLE_VALUE ) {
@@ -124,9 +160,62 @@ void ReleaseConsole() {
     outBuffer = INVALID_HANDLE_VALUE;
   }
 
-  stdIn = INVALID_HANDLE_VALUE;
-  stdOut = INVALID_HANDLE_VALUE;
-  stdErr = INVALID_HANDLE_VALUE;
+  stdInput = INVALID_HANDLE_VALUE;
+  stdOutput = INVALID_HANDLE_VALUE;
+  stdError = INVALID_HANDLE_VALUE;
+}
+
+void ConPutChar( char ch ) {
+  DWORD charsWritten = 0;
+
+  if( ch && (stdOutput != INVALID_HANDLE_VALUE) ) {
+    WriteConsole( outBuffer, &ch, 1, &charsWritten, NULL );
+  }
+}
+
+/** Event implementations **/
+
+unsigned ReadKey( KeyInfo* key ) {
+  DWORD eventsRead = 1;
+  INPUT_RECORD event = {};
+  KeyInfo keyInfo = {};
+
+  if( key == NULL ) { return 0; }
+
+  if( (PeekConsoleInput(stdInput, &event, 1,
+      &eventsRead) == 0) || (eventsRead == 0) ) {
+    return 0;
+  }
+
+  if( event.EventType == KEY_EVENT ) {
+    if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ||
+        (event.Event.KeyEvent.bKeyDown == 0) ) {
+      return 0;
+    }
+
+    keyInfo.code = event.Event.KeyEvent.wVirtualKeyCode;
+    keyInfo.ch = event.Event.KeyEvent.uChar.AsciiChar;
+    keyInfo.modifiers = event.Event.KeyEvent.dwControlKeyState;
+
+    *key = keyInfo;
+    return 1;
+  }
+
+  return 0;
+}
+
+void RouteEvent() {
+  DWORD eventsRead = 1;
+  INPUT_RECORD event = {};
+
+  if( (PeekConsoleInput(stdInput, &event, 1,
+      &eventsRead) == 0) || (eventsRead == 0) ) {
+    return;
+  }
+
+  if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ) {
+    return;
+  }
 }
 
 /** App implementation **/
@@ -134,8 +223,8 @@ void ReleaseConsole() {
 unsigned IsActive() {
   if( appIsActive &&
       (outBuffer != INVALID_HANDLE_VALUE) &&
-      (stdIn != INVALID_HANDLE_VALUE) ) {
-    return appIsActive;
+      (stdInput != INVALID_HANDLE_VALUE) ) {
+    return 1;
   }
 
   return 0;

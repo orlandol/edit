@@ -447,7 +447,7 @@ unsigned IsActive( Console* console ) {
 
 void RouteEvents( Console* console ) {
   DWORD eventsRead = 1;
-  INPUT_RECORD event;
+  INPUT_RECORD event = {};
   KeyEvent keyEvent = {};
 
   if( !(console && (console->stdinHandle != INVALID_HANDLE_VALUE) &&
