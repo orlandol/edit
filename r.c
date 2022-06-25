@@ -4,6 +4,10 @@
 #ifdef _WIN32
 #include "windows.h"
 
+#ifndef ENABLE_EXTENDED_FLAGS
+#define ENABLE_EXTENDED_FLAGS 0x0080
+#endif
+
 #define keyEscape (VK_ESCAPE)
 #endif
 
@@ -11,6 +15,7 @@ typedef struct KeyInfo {
   unsigned code;
   char ch;
   unsigned modifiers;
+  unsigned count;
 } KeyInfo;
 
 unsigned Keypressed();
@@ -27,6 +32,10 @@ unsigned Keypressed() {
   if( (PeekConsoleInput(stdInput, &event, 1,
       &eventsRead) == 0) || (eventsRead == 0) ) {
     return 0;
+  }
+
+  if( event.EventType == KEY_EVENT ) {
+    return 1;
   }
 
   return 0;
@@ -77,8 +86,15 @@ void RouteEvent() {
 
 int main( int argc, char** argv ) {
   KeyInfo key = {};
+  DWORD callerInputMode = 0;
 
   stdInput = GetStdHandle(STD_INPUT_HANDLE);
+
+  GetConsoleMode( stdInput, &callerInputMode );
+
+  SetConsoleMode(stdInput, ENABLE_EXTENDED_FLAGS |
+      ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT |
+      ENABLE_WINDOW_INPUT );
 
   while( key.code != keyEscape ) {
     if( ReadKey(&key) ) {
@@ -89,6 +105,8 @@ int main( int argc, char** argv ) {
       RouteEvent();
     }
   }
+
+  SetConsoleMode( stdInput, callerInputMode );
 
   return 0;
 }
