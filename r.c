@@ -11,11 +11,16 @@
 #define keyEscape (VK_ESCAPE)
 #endif
 
+enum EventType {
+  evtNone,
+  evtKeyUp,
+  evtKeyDown
+};
+
 typedef struct KeyInfo {
   unsigned code;
   char ch;
   unsigned modifiers;
-  unsigned count;
 } KeyInfo;
 
 unsigned Keypressed();
@@ -48,16 +53,12 @@ unsigned ReadKey( KeyInfo* key ) {
 
   if( key == NULL ) { return 0; }
 
-  if( (PeekConsoleInput(stdInput, &event, 1,
-      &eventsRead) == 0) || (eventsRead == 0) ) {
+  if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ) {
     return 0;
   }
 
   if( event.EventType == KEY_EVENT ) {
-    if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ||
-        (event.Event.KeyEvent.bKeyDown == 0) ) {
-      return 0;
-    }
+    /// TODO: Call OnKeyDown or OnKeyUp based on bKeyDown
 
     keyInfo.code = event.Event.KeyEvent.wVirtualKeyCode;
     keyInfo.ch = event.Event.KeyEvent.uChar.AsciiChar;
@@ -70,22 +71,41 @@ unsigned ReadKey( KeyInfo* key ) {
   return 0;
 }
 
+KeyInfo key = {};
+
 void RouteEvent() {
   DWORD eventsRead = 1;
   INPUT_RECORD event = {};
 
-  if( (PeekConsoleInput(stdInput, &event, 1,
-      &eventsRead) == 0) || (eventsRead == 0) ) {
+  if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ) {
     return;
   }
 
-  if( (ReadConsoleInput(stdInput, &event, 1, &eventsRead) == 0) ) {
-    return;
+  switch( event.EventType ) {
+  case MOUSE_EVENT:
+    printf( "[MOUSE_EVENT: ]\n" );
+    break;
+
+  case KEY_EVENT:
+    key.code = event.Event.KeyEvent.wVirtualKeyCode;
+    key.ch = event.Event.KeyEvent.uChar.AsciiChar;
+    key.modifiers = event.Event.KeyEvent.dwControlKeyState;
+
+    if( event.Event.KeyEvent.bKeyDown ) {
+      if( key.ch == '\r' ) {
+        printf( "\n" );
+      } else {
+        putchar( event.Event.KeyEvent.uChar.AsciiChar );
+      }
+    }
+    break;
+
+  default:
+    printf( "[Other Event: ]\n" );
   }
 }
 
 int main( int argc, char** argv ) {
-  KeyInfo key = {};
   DWORD callerInputMode = 0;
 
   stdInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -97,13 +117,9 @@ int main( int argc, char** argv ) {
       ENABLE_WINDOW_INPUT );
 
   while( key.code != keyEscape ) {
-    if( ReadKey(&key) ) {
-      if( key.ch ) {
-        putchar( key.ch );
-      }
-    } else {
-      RouteEvent();
-    }
+    RouteEvent();
+
+    /// TODO: Draw UI
   }
 
   SetConsoleMode( stdInput, callerInputMode );
